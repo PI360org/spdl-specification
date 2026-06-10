@@ -1,0 +1,582 @@
+{
+  "spdlVersion": "0.1",
+  "metadata": {
+    "processName": "SAP MM Goods Receipt (Wareneingang)",
+    "processId": "SAP_MM_MIGO_001",
+    "author": "Jean-Marc Erieau, PI360 gUG",
+    "createdDate": "2026-06-03",
+    "version": "1.0",
+    "status": "Active",
+    "domain": "Supply Chain / Materials Management",
+    "description": "Complete goods receipt process in SAP MM with quality inspection, financial posting, and exception handling"
+  },
+  "processModel": {
+    "processName": "SAP MM Goods Receipt",
+    "purpose": "Record goods received from suppliers in inventory and accounting systems",
+    "trigger": "Purchase Order (PO) created in SAP, Goods physically arrive at dock",
+    "outcome": "Goods recorded in inventory, accounting entry posted, invoice can be matched",
+    "frequency": "Daily (multiple times per day)",
+    "volume": {
+      "casesPerDay": 50,
+      "casesPerMonth": 1000,
+      "casesPerYear": 12000
+    },
+    "roles": [
+      "Dock Supervisor",
+      "Quality Engineer",
+      "Warehouse Lead",
+      "SAP User",
+      "Senior Quality Engineer (Escalation)"
+    ],
+    "activities": [
+      {
+        "id": "receive_goods",
+        "name": "Receive Goods at Dock",
+        "semanticType": "PhysicalReceiving",
+        "businessMeaning": "Accept goods delivery from supplier, verify labels, count units",
+        "performer": "Dock Supervisor",
+        "duration": "15-30 minutes",
+        "durationMinutes": 22.5,
+        "sequence": 1,
+        "inputObjects": ["ShippingDocument", "PurchaseOrder"],
+        "outputObjects": ["GoodsReceipt", "PhysicalCount"],
+        "systemsInvolved": ["Manual", "Barcode Scanner"],
+        "isManual": true,
+        "kpisAffected": ["cycle_time", "first_touch_time"]
+      },
+      {
+        "id": "quality_inspect",
+        "name": "Quality Inspection",
+        "semanticType": "QualityControl",
+        "businessMeaning": "Inspect goods for damage, defects, correct specification",
+        "performer": "Quality Engineer",
+        "duration": "10-45 minutes",
+        "durationMinutes": 27.5,
+        "sequence": 2,
+        "inputObjects": ["GoodsReceipt", "PurchaseOrder"],
+        "outputObjects": ["InspectionReport", "QualityDecision"],
+        "systemsInvolved": ["SAP QM", "Manual Documentation"],
+        "isManual": true,
+        "kpisAffected": ["quality_score", "defect_rate", "cycle_time"]
+      },
+      {
+        "id": "post_receipt",
+        "name": "Post Goods Receipt in SAP",
+        "semanticType": "AccountingRelevantInventoryPosting",
+        "businessMeaning": "Record inventory receipt in SAP MM (transaction MIGO), create accounting entry",
+        "performer": "SAP User",
+        "duration": "5-10 minutes",
+        "durationMinutes": 7.5,
+        "sequence": 3,
+        "inputObjects": ["GoodsReceipt", "InspectionReport", "PurchaseOrder"],
+        "outputObjects": ["SAPMIGOTransaction", "InventoryBalance", "AccountingEntry"],
+        "systemsInvolved": ["SAP MM (MIGO)", "SAP Finance Module"],
+        "isManual": false,
+        "kpisAffected": ["cycle_time", "accuracy", "inventory_value"]
+      },
+      {
+        "id": "match_invoice",
+        "name": "Match Invoice to Goods Receipt",
+        "semanticType": "ThreeWayMatching",
+        "businessMeaning": "Match supplier invoice with PO and goods receipt for 3-way matching",
+        "performer": "SAP User",
+        "duration": "3-5 minutes",
+        "durationMinutes": 4,
+        "sequence": 4,
+        "inputObjects": ["SAPMIGOTransaction", "SupplierInvoice", "PurchaseOrder"],
+        "outputObjects": ["MatchingResult"],
+        "systemsInvolved": ["SAP Invoice Verification (MIRO)"],
+        "isManual": false,
+        "kpisAffected": ["matching_accuracy", "cycle_time", "payment_delay"]
+      }
+    ],
+    "decisions": [
+      {
+        "id": "quality_decision",
+        "question": "Is the goods quality acceptable?",
+        "businessMeaning": "Determine if goods meet quality standards and can be received",
+        "outcomes": ["Accept", "Reject", "Hold for Engineering Review"],
+        "frequencyPerOutcome": {
+          "Accept": "89%",
+          "Reject": "8%",
+          "HoldForReview": "3%"
+        },
+        "owner": "Quality Engineer",
+        "automationPotential": "Medium"
+      },
+      {
+        "id": "variance_check",
+        "question": "Does received quantity match PO?",
+        "businessMeaning": "Verify goods quantity does not exceed acceptable variance",
+        "outcomes": ["Matches", "Variance < 2%", "Variance > 2%"],
+        "frequencyPerOutcome": {
+          "Matches": "92%",
+          "Variance < 2%": "6%",
+          "Variance > 2%": "2%"
+        },
+        "owner": "Dock Supervisor",
+        "automationPotential": "High"
+      }
+    ],
+    "variants": [
+      {
+        "id": "variant_damaged",
+        "name": "Damaged Goods Received",
+        "trigger": "Quality inspection reveals damage > 5%",
+        "frequency": "8%",
+        "activities": [
+          "receive_goods",
+          "quality_inspect",
+          "escalate_to_quality_engineering",
+          "create_return_shipment",
+          "contact_supplier"
+        ],
+        "impact": "Delays processing 3-5 days, cost impact €2000-5000"
+      },
+      {
+        "id": "variant_quantity_variance",
+        "name": "Quantity Variance (>2%)",
+        "trigger": "Received quantity differs from PO by more than 2%",
+        "frequency": "2%",
+        "activities": [
+          "receive_goods",
+          "quality_inspect",
+          "escalate_to_warehouse_lead",
+          "contact_supplier",
+          "adjust_po_or_return"
+        ],
+        "impact": "Inventory discrepancy, potential payment hold"
+      },
+      {
+        "id": "variant_invoice_mismatch",
+        "name": "Invoice Quantity Mismatch",
+        "trigger": "Invoice quantity differs from goods receipt",
+        "frequency": "5%",
+        "activities": [
+          "flag_invoice",
+          "contact_supplier",
+          "hold_payment",
+          "resolve_discrepancy",
+          "process_payment"
+        ],
+        "impact": "Payment delay 5-10 days, working capital impact"
+      }
+    ],
+    "cycleTimeAnalysis": {
+      "averageProcessingTime": "45 minutes",
+      "averageWaitingTime": "2-3 hours",
+      "totalCycleTime": "3-4 hours",
+      "criticalPath": [
+        "receive_goods (22.5 min)",
+        "quality_inspect (27.5 min)",
+        "post_receipt (7.5 min)",
+        "match_invoice (4 min)"
+      ]
+    }
+  },
+  "semanticLayer": {
+    "concepts": [
+      {
+        "id": "concept_goods_receipt",
+        "name": "Goods Receipt",
+        "definition": "A business transaction documenting the physical receipt of goods from a supplier and recording them in inventory",
+        "semanticType": "InventoryTransaction",
+        "synonyms": ["GR", "Wareneingang", "Goods Receiving", "Material Receipt"],
+        "relatedConcepts": ["PurchaseOrder", "SupplierInvoice", "InventoryBalance"],
+        "hierarchy": {
+          "parent": "InboundLogisticsEvent",
+          "children": ["StandardGoodsReceipt", "ReturnableGoodsReceipt", "ConsignmentReceipt"]
+        },
+        "owner": "Materials Management"
+      },
+      {
+        "id": "concept_quality_check",
+        "name": "Quality Inspection",
+        "definition": "Process of examining received goods for defects, damage, correct specification, and compliance with purchase order",
+        "semanticType": "QualityAssurance",
+        "synonyms": ["QC Check", "Goods Inspection", "Quality Control", "Warenqualitätskontrolle"],
+        "relatedConcepts": ["DefectRate", "InspectionCriteria", "AcceptanceCriteria"],
+        "owner": "Quality Engineering"
+      },
+      {
+        "id": "concept_three_way_match",
+        "name": "Three-Way Matching",
+        "definition": "Verification that purchase order, goods receipt, and supplier invoice match in quantity, price, and terms",
+        "semanticType": "FinancialControl",
+        "synonyms": ["3-Way Match", "3-Way Matching", "PO-GR-Invoice Match"],
+        "relatedConcepts": ["PurchaseOrder", "GoodsReceipt", "SupplierInvoice"],
+        "owner": "Finance/Procurement"
+      }
+    ],
+    "businessObjects": [
+      {
+        "id": "obj_purchase_order",
+        "name": "Purchase Order",
+        "semanticType": "ProcurementDocument",
+        "description": "Formal request to supplier for goods, quantities, prices, and delivery terms",
+        "attributes": [
+          "PONumber",
+          "SupplierName",
+          "OrderedQuantity",
+          "OrderedPrice",
+          "DeliveryDate",
+          "Incoterms"
+        ],
+        "identifiers": ["PONumber", "SAPDocument"],
+        "lifecycle": ["Created", "Sent", "Acknowledged", "PartiallyReceived", "Received", "Invoiced"],
+        "owner": "Procurement",
+        "system": "SAP MM",
+        "relatedObjects": ["GoodsReceipt", "SupplierInvoice", "ReceiptSchedule"]
+      },
+      {
+        "id": "obj_goods_receipt",
+        "name": "Goods Receipt Document",
+        "semanticType": "InventoryDocument",
+        "description": "Record of goods physically received, inspected, and accepted into inventory",
+        "attributes": [
+          "GRNumber",
+          "ReceiptDate",
+          "ReceivedQuantity",
+          "ReceivedCondition",
+          "InspectionResult",
+          "StorageLocation",
+          "Lot/SerialNumber"
+        ],
+        "identifiers": ["GRNumber", "SAPTransaction"],
+        "lifecycle": ["Draft", "InspectionPending", "InspectionPass", "Posted", "Reconciled", "Archived"],
+        "owner": "Warehouse",
+        "system": "SAP MM",
+        "relatedObjects": ["PurchaseOrder", "SupplierInvoice", "InventoryBalance"]
+      },
+      {
+        "id": "obj_supplier_invoice",
+        "name": "Supplier Invoice",
+        "semanticType": "FinancialDocument",
+        "description": "Request for payment from supplier for goods delivered",
+        "attributes": [
+          "InvoiceNumber",
+          "InvoiceDate",
+          "InvoicedQuantity",
+          "InvoicedPrice",
+          "DueDate",
+          "PaymentTerms"
+        ],
+        "identifiers": ["InvoiceNumber", "SupplierID"],
+        "lifecycle": ["Received", "Matched", "Approved", "Posted", "Paid"],
+        "owner": "Finance",
+        "system": "SAP Finance",
+        "relatedObjects": ["PurchaseOrder", "GoodsReceipt"]
+      }
+    ],
+    "kpis": [
+      {
+        "id": "kpi_cycle_time",
+        "name": "Goods Receipt Cycle Time",
+        "description": "Time from goods arrival to SAP posting",
+        "formula": "PostingDate - ReceiptDate",
+        "target": "< 4 hours (Same day)",
+        "owner": "Operations Manager",
+        "frequency": "Per transaction"
+      },
+      {
+        "id": "kpi_quality_pass_rate",
+        "name": "Quality Inspection Pass Rate",
+        "description": "Percentage of goods accepted without rework",
+        "formula": "AcceptedGR / TotalGR * 100",
+        "target": "> 95%",
+        "owner": "Quality Manager",
+        "frequency": "Daily"
+      },
+      {
+        "id": "kpi_inventory_accuracy",
+        "name": "Inventory Accuracy",
+        "description": "Accuracy of inventory balance vs. physical count",
+        "formula": "CorrectRecords / TotalRecords * 100",
+        "target": "> 99%",
+        "owner": "Warehouse Manager",
+        "frequency": "Monthly"
+      }
+    ]
+  },
+  "knowledgeLayer": {
+    "businessRules": [
+      {
+        "id": "rule_quality_acceptance",
+        "name": "Goods Acceptance Quality Rule",
+        "description": "Rule for accepting goods based on quality inspection result",
+        "rule": "IF received_condition = 'Acceptable' AND quantity_variance <= 2% AND inspection_defects < 5% THEN post_gr_automatically ELSE escalate_to_quality_engineer",
+        "businessImpact": "Controls inventory quality and prevents defective goods posting",
+        "owner": "Quality Engineer",
+        "source": "ISO 9001:2015 Section 8.6",
+        "lastReviewed": "2026-05-15"
+      },
+      {
+        "id": "rule_variance_threshold",
+        "name": "Quantity Variance Threshold",
+        "description": "Maximum acceptable variance between PO and GR",
+        "rule": "IF absolute(gr_quantity - po_quantity) / po_quantity <= 0.02 THEN acceptable ELSE flag_for_review",
+        "businessImpact": "Ensures inventory accuracy and prevents overstocking/understocking",
+        "owner": "Procurement Manager",
+        "source": "Company Procurement Policy 2.3.1",
+        "lastReviewed": "2026-04-20"
+      },
+      {
+        "id": "rule_three_way_match",
+        "name": "Three-Way Matching Rule",
+        "description": "Rule for matching PO, GR, and Invoice",
+        "rule": "IF po_quantity = gr_quantity AND gr_quantity = invoice_quantity AND po_price = invoice_price THEN approve_payment ELSE hold_for_approval",
+        "businessImpact": "Prevents duplicate payments and fraudulent invoices",
+        "owner": "Finance Controller",
+        "source": "Internal Control Framework, Accounts Payable",
+        "lastReviewed": "2026-05-01"
+      }
+    ],
+    "risks": [
+      {
+        "id": "risk_damaged_goods",
+        "name": "Damaged or Non-Conforming Goods",
+        "description": "Goods received in damaged condition or not meeting quality specifications",
+        "likelihood": "Medium",
+        "impact": "High",
+        "triggers": [
+          "Poor supplier packaging",
+          "Shipping damage",
+          "Quality defects in manufacturing",
+          "Goods exceed quality tolerance"
+        ],
+        "mitigations": [
+          "control_quality_inspection",
+          "control_supplier_scorecards"
+        ],
+        "annualCost": "€5,000-10,000"
+      },
+      {
+        "id": "risk_quantity_discrepancy",
+        "name": "Goods Quantity Discrepancy",
+        "description": "Received quantity differs significantly from PO",
+        "likelihood": "Low",
+        "impact": "Medium",
+        "triggers": [
+          "Supplier shipping error",
+          "Partial shipment without notification",
+          "Receiving error or miscounting"
+        ],
+        "mitigations": [
+          "control_barcode_verification",
+          "control_dock_supervisor_training"
+        ],
+        "annualCost": "€2,000-5,000"
+      },
+      {
+        "id": "risk_invoice_mismatch",
+        "name": "Invoice-GR Mismatch",
+        "description": "Supplier invoice quantity/price differs from goods receipt and PO",
+        "likelihood": "Medium",
+        "impact": "Medium",
+        "triggers": [
+          "Supplier invoicing error",
+          "Partial receipt not communicated",
+          "Price change not agreed"
+        ],
+        "mitigations": [
+          "control_three_way_matching",
+          "control_invoice_review"
+        ],
+        "annualCost": "€3,000-8,000"
+      }
+    ],
+    "controls": [
+      {
+        "id": "control_quality_inspection",
+        "name": "Quality Inspection at Receipt",
+        "description": "Mandatory quality inspection of all incoming goods before posting in SAP",
+        "type": "Preventive",
+        "relatesTo": ["risk_damaged_goods"],
+        "frequency": "Per goods receipt",
+        "owner": "Quality Engineer"
+      },
+      {
+        "id": "control_three_way_matching",
+        "name": "Three-Way Matching (PO-GR-Invoice)",
+        "description": "Verify that purchase order, goods receipt, and supplier invoice match",
+        "type": "Detective",
+        "relatesTo": ["risk_invoice_mismatch"],
+        "frequency": "Per invoice",
+        "owner": "Finance/Accounts Payable"
+      },
+      {
+        "id": "control_barcode_verification",
+        "name": "Barcode Verification at Dock",
+        "description": "Scan barcodes of all received goods to verify quantity and product",
+        "type": "Preventive",
+        "relatesTo": ["risk_quantity_discrepancy"],
+        "frequency": "Per goods receipt",
+        "owner": "Dock Supervisor"
+      },
+      {
+        "id": "control_supplier_scorecards",
+        "name": "Supplier Quality Scorecard",
+        "description": "Monthly tracking of supplier quality performance",
+        "type": "Detective",
+        "relatesTo": ["risk_damaged_goods"],
+        "frequency": "Monthly",
+        "owner": "Procurement Manager"
+      }
+    ],
+    "knowledgeSources": [
+      {
+        "id": "source_sop_goods_receipt",
+        "name": "SOP: Goods Receipt Process",
+        "type": "SOP",
+        "owner": "Operations Manager",
+        "location": "SharePoint / Process Documentation / GR_SOP_v2.3.docx",
+        "qualityScore": 8,
+        "lastUpdated": "2026-04-15",
+        "trustLevel": "High"
+      },
+      {
+        "id": "source_sap_migo_guide",
+        "name": "SAP MIGO Transaction Guide",
+        "type": "Documentation",
+        "owner": "SAP Basis Team",
+        "location": "SAP Help Portal / Transactions / MIGO",
+        "qualityScore": 9,
+        "lastUpdated": "2026-05-10",
+        "trustLevel": "High"
+      },
+      {
+        "id": "source_quality_engineer",
+        "name": "Quality Engineer Expertise",
+        "type": "Expert",
+        "owner": "Thomas Weber (Quality Engineer)",
+        "location": "Dock Area / Office",
+        "qualityScore": 8,
+        "lastUpdated": "Ongoing",
+        "trustLevel": "High"
+      }
+    ]
+  },
+  "agentLayer": {
+    "agentBlueprints": [
+      {
+        "agentId": "agent_gr_automation",
+        "agentName": "Goods Receipt Automation Agent",
+        "purpose": "Automate routine goods receipt posting and quality decisions",
+        "businessOutcome": "Reduce manual GR processing time from 45 min to 5 min, improve accuracy to 99%+",
+        "trigger": "Goods Receipt created in SAP by Quality Engineer",
+        "inputData": [
+          "PONumber",
+          "ReceivedQuantity",
+          "ReceivedCondition",
+          "InspectionResult",
+          "VariancePercentage"
+        ],
+        "requiredContext": [
+          "Quality Acceptance Criteria",
+          "Variance Tolerance Rules",
+          "Storage Location Rules",
+          "Supplier History"
+        ],
+        "businessRules": [
+          "rule_quality_acceptance",
+          "rule_variance_threshold"
+        ],
+        "decisions": [
+          "Should I post the GR automatically?",
+          "Should I escalate to Quality Engineer?",
+          "Should I flag for variance review?"
+        ],
+        "actions": [
+          "Execute SAP MIGO transaction",
+          "Create accounting entry",
+          "Escalate to Quality Engineer",
+          "Send notification to Warehouse"
+        ],
+        "escalationTriggers": [
+          "Variance > 2%",
+          "Condition != Acceptable",
+          "Defect rate > 5%",
+          "GR flagged manually",
+          "Supplier risk flag"
+        ],
+        "escalationTarget": "Senior Quality Engineer",
+        "systems": [
+          "SAP MM (MIGO)",
+          "SAP Finance",
+          "Quality Management System"
+        ],
+        "kpis": [
+          "kpi_cycle_time",
+          "kpi_quality_pass_rate",
+          "kpi_inventory_accuracy"
+        ],
+        "riskLevel": "Medium",
+        "complianceRequirements": [
+          "Audit trail of all GR postings",
+          "Segregation of duties",
+          "Change log for amounts > €10,000"
+        ],
+        "readinessScore": 78,
+        "readinessFeedback": "Ready for pilot automation. Needs data integration for supplier risk flags."
+      },
+      {
+        "agentId": "agent_invoice_matcher",
+        "agentName": "Invoice-GR Matching Agent",
+        "purpose": "Automate three-way matching and flag discrepancies",
+        "businessOutcome": "Reduce payment cycle time by 3-5 days, prevent duplicate payments",
+        "trigger": "Supplier invoice received in SAP (MIRO)",
+        "inputData": [
+          "InvoiceNumber",
+          "InvoicedQuantity",
+          "InvoicedPrice",
+          "PONumber",
+          "GRNumber"
+        ],
+        "requiredContext": [
+          "PO Details",
+          "GR Details",
+          "Acceptable variance tolerance",
+          "Price agreement terms"
+        ],
+        "businessRules": [
+          "rule_three_way_match"
+        ],
+        "decisions": [
+          "Does invoice match GR and PO?",
+          "Is variance within tolerance?",
+          "Can I approve for payment?"
+        ],
+        "actions": [
+          "Approve invoice match",
+          "Flag for three-way mismatch",
+          "Hold for manual review",
+          "Escalate to Accounts Payable"
+        ],
+        "escalationTriggers": [
+          "Invoice quantity != GR",
+          "Invoice price != PO",
+          "Variance > 2%",
+          "Invoice amount > €50,000"
+        ],
+        "escalationTarget": "Accounts Payable Manager",
+        "systems": [
+          "SAP Finance (MIRO)",
+          "SAP MM"
+        ],
+        "kpis": [
+          "payment_cycle_time",
+          "invoice_accuracy",
+          "duplicate_prevention"
+        ],
+        "riskLevel": "Low",
+        "complianceRequirements": [
+          "GAAP compliance",
+          "Fraud prevention",
+          "Approval authority limits"
+        ],
+        "readinessScore": 85,
+        "readinessFeedback": "Highly automatable. Clear decision logic, low risk."
+      }
+    ]
+  }
+}
