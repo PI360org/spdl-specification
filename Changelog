@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes to SPDL (Semantic Process Definition Language) will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1] - 2026-06-03
+
+### Added
+- Initial SPDL specification (v0.1)
+- Core 4-layer semantic framework:
+  - Layer 1: Process Model (activities, decisions, variants)
+  - Layer 2: Semantic Layer (concepts, definitions, relationships)
+  - Layer 3: Knowledge Layer (business rules, risks, controls)
+  - Layer 4: Agent Layer (AI blueprints, execution specs)
+- JSON Schema specification (spdl-schema-v0.1.json)
+- Example processes:
+  - Goods Receipt (SAP MM)
+  - Invoice Processing (Finance)
+  - Sponsorship Process (Business Development)
+- Dual license
+- Comprehensive README and documentation
+
+### Documentation
+- README with quick start guide
+- SPDL schema with property descriptions
+- Example SPDL documents with real process data
+- Use case documentation
+
+## Planned for [0.2] - Q3 2026
+
+### Planned
+- YAML format support
+- XML export capability
+- Validation tooling and CLI
+- Additional examples (10+ processes)
+- GitHub organization templates
+- Community contribution guidelines
+
+## Planned for [1.0] - Q4 2026
+
+### Planned
+- Official specification release
+- Multiple language support
+- Industry standards alignment (BPMN, OCPM)
+- Complete toolkit release
+- Enterprise features
+
+---
+
+## How to Contribute
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+All contributions are welcome!
