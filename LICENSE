@@ -1,0 +1,206 @@
+================================================================================
+SPDL - SEMANTIC PROCESS DEFINITION LANGUAGE
+DUAL LICENSE AGREEMENT
+================================================================================
+ 
+LICENSOR: Jean-Marc Erieau, PI360 gUG
+DATE: June 2026
+VERSION: 1.0
+ 
+This SPDL Specification is licensed under a DUAL LICENSE model:
+ 
+================================================================================
+LICENSE OPTION 1: CC BY-SA 4.0 (NON-COMMERCIAL - FREE)
+================================================================================
+ 
+For non-commercial use, SPDL is licensed under Creative Commons 
+Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).
+ 
+FREE TO USE FOR:
+✅ Research and education
+✅ Non-profit organizations
+✅ Internal documentation
+✅ Modify and extend SPDL
+✅ Share your SPDL documents
+✅ Teach and train with SPDL
+ 
+CONDITIONS:
+📋 Give attribution to PI360 gUG
+📋 Share modifications under CC BY-SA 4.0
+📋 Don't claim SPDL as your own
+ 
+================================================================================
+LICENSE OPTION 2: COMMERCIAL LICENSE (PAID)
+================================================================================
+ 
+For commercial use, you MUST obtain a Commercial License from PI360 gUG.
+ 
+YOU NEED A COMMERCIAL LICENSE IF YOU:
+ 
+✗ Build a commercial product or service using SPDL
+✗ Offer SPDL-based services for payment
+✗ Integrate SPDL into a for-profit system
+✗ Create a competing product to PI360
+✗ Sell or license SPDL to third parties
+ 
+COMMERCIAL USE EXAMPLES:
+- SaaS platform based on SPDL
+- Process consulting services
+- Enterprise software integration
+- Competing process intelligence product
+- Paid training or certification
+ 
+HOW TO GET A COMMERCIAL LICENSE:
+ 
+1. Email: info@pi360.org
+2. Subject: "Commercial License Request - [Your Company]"
+3. Tell us: Company name, intended use, commercial value, timeline
+4. Negotiate: PI360 proposes licensing terms
+5. License options:
+   - Flat fee license (one-time)
+   - Royalty-based license (% of revenue)
+   - Subscription license (annual)
+   - Custom restricted license
+ 
+TYPICAL COMMERCIAL LICENSE FEES (Examples only):
+ 
+Small Business (< 100k revenue): EUR 2,000 - EUR 5,000
+Medium Business (100k - 1M): EUR 5,000 - EUR 25,000 or 5-10% royalty
+Enterprise (> 1M): Custom negotiation, typically 5-15% royalty
+SaaS Competitors: EUR 50,000+ or 15-20% royalty
+ 
+Note: Actual fees depend on scope, commercial value, territory, and exclusivity.
+ 
+BENEFIT: License revenue funds PI360's research, education, and community work.
+ 
+================================================================================
+WHICH LICENSE DO YOU NEED?
+================================================================================
+ 
+USE FREE CC BY-SA 4.0 IF:
+- Academic research or education
+- Non-profit organizations
+- Internal company documentation
+- Personal or hobby projects
+- Open source software (non-commercial)
+- Government or public sector
+- Learning or training (not for sale)
+ 
+USE COMMERCIAL LICENSE IF:
+- Building commercial product/service
+- Offering services for payment
+- Using in for-profit software
+- Creating competing products
+- Consulting/implementation services
+- Training/certification (for payment)
+- Integrating into enterprise systems
+ 
+DECISION RULE: "Will someone pay money for this?"
+YES = Need Commercial License (contact licensing@pi360.org)
+NO = Free CC BY-SA 4.0 applies
+ 
+================================================================================
+CC BY-SA 4.0 FULL TERMS (NON-COMMERCIAL USE)
+================================================================================
+ 
+DEFINITIONS:
+ 
+Licensed Material = SPDL Specification and documentation
+You = Person or entity using the Licensed Material
+Licensor = Jean-Marc Erieau, PI360 gUG
+Adapted Material = Modified versions of SPDL
+Share = Make publicly available
+ 
+LICENSE GRANT:
+ 
+You are granted a worldwide, royalty-free, non-exclusive license to:
+- Reproduce SPDL (copy it)
+- Share SPDL (distribute it)
+- Adapt SPDL (modify it)
+ 
+CONDITIONS:
+ 
+1. ATTRIBUTION
+   - Credit the Licensor (PI360 gUG)
+   - Include "Licensed under CC BY-SA 4.0"
+   - Indicate if changes were made
+   - Link to this license
+ 
+2. SHARE-ALIKE
+   - If you modify SPDL, modifications must be CC BY-SA 4.0
+   - Cannot apply different terms to adapted material
+ 
+3. NO ADDITIONAL RESTRICTIONS
+   - Cannot use technological measures that restrict others' rights
+ 
+DISCLAIMER:
+ 
+SPDL is provided "as-is" without warranties of any kind.
+Licensor is NOT liable for any damages from using SPDL.
+ 
+TERMINATION:
+ 
+If you violate this license, your rights automatically terminate.
+Rights reinstate if violation is cured within 30 days.
+ 
+================================================================================
+FAQ - DUAL LICENSE
+================================================================================
+ 
+Q: Can I use SPDL for free internally?
+A: YES - if it's internal and non-commercialized (free under CC BY-SA 4.0)
+ 
+Q: Can I build a startup using SPDL?
+A: Once you generate revenue, you need Commercial License
+   Contact: licensing@pi360.org
+ 
+Q: Can I modify SPDL?
+A: YES under CC BY-SA 4.0, but modifications stay CC BY-SA 4.0
+   (non-commercial only)
+ 
+Q: Can I teach SPDL for free?
+A: YES - education is non-commercial
+   But charging for training requires Commercial License
+ 
+Q: What counts as "commercial"?
+A: Anything where someone pays for a product/service based on SPDL
+ 
+Q: How much does Commercial License cost?
+A: Contact licensing@pi360.org for quote (depends on use case)
+ 
+Q: Can I fork SPDL on GitHub?
+A: YES under CC BY-SA 4.0 (non-commercial)
+   Commercial use later requires Commercial License
+ 
+Q: What about government/public sector?
+A: Typically non-commercial, so CC BY-SA 4.0 applies for free
+ 
+================================================================================
+CONTACT INFORMATION
+================================================================================
+ 
+Non-Commercial Use (CC BY-SA 4.0):
+- Automatically granted
+- No permission needed
+- Just follow CC BY-SA 4.0 conditions
+ 
+Commercial License:
+- Email: info@pi360.org
+- Subject: "Commercial License - [Your Company]"
+ 
+General Questions about SPDL:
+- GitHub: https://github.com/pi360/spdl-specification
+- Email: info@pi360.org
+- Website: https://pi360.org (coming 2026)
+ 
+================================================================================
+EFFECTIVE: June 2026
+VERSION: 1.0
+ 
+LICENSOR:
+Jean-Marc Erieau
+Founder, PI360 gUG - The Process Intelligence Network
+ 
+================================================================================
+END OF LICENSE
+================================================================================
