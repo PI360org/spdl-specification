@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://spdl.pi360.org/schema/v0.1/spdl-schema.json",
+  "title": "Semantic Process Definition Language (SPDL) Schema",
+  "description": "SPDL v0.1 - A semantic framework for making business process knowledge machine-readable for AI agents",
+  "type": "object",
+  "required": ["spdlVersion", "metadata", "processModel"],
+  "properties": {
+    "spdlVersion": {
+      "type": "string",
+      "enum": ["0.1"],
+      "default": "0.1"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["processName", "author", "createdDate"],
+      "properties": {
+        "processName": {"type": "string"},
+        "author": {"type": "string"},
+        "createdDate": {"type": "string", "format": "date"},
+        "version": {"type": "string"},
+        "status": {"type": "string", "enum": ["Draft", "Review", "Active", "Archived"]}
+      }
+    },
+    "processModel": {
+      "type": "object",
+      "required": ["processName", "purpose"],
+      "properties": {
+        "processName": {"type": "string"},
+        "purpose": {"type": "string"},
+        "trigger": {"type": "string"},
+        "outcome": {"type": "string"},
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "semanticType": {"type": "string"},
+              "performer": {"type": "string"},
+              "duration": {"type": "string"},
+              "sequence": {"type": "integer"}
+            }
+          }
+        },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "question"],
+            "properties": {
+              "id": {"type": "string"},
+              "question": {"type": "string"},
+              "outcomes": {"type": "array", "items": {"type": "string"}},
+              "owner": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "semanticLayer": {
+      "type": "object",
+      "properties": {
+        "concepts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "definition"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "definition": {"type": "string"},
+              "synonyms": {"type": "array", "items": {"type": "string"}},
+              "owner": {"type": "string"}
+            }
+          }
+        },
+        "businessObjects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "lifecycle": {"type": "array", "items": {"type": "string"}},
+              "owner": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "knowledgeLayer": {
+      "type": "object",
+      "properties": {
+        "businessRules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "rule"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "rule": {"type": "string"},
+              "owner": {"type": "string"}
+            }
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id": {"type": "string"},
+              "name": {"type": "string"},
+              "likelihood": {"type": "string", "enum": ["Low", "Medium", "High"]},
+              "impact": {"type": "string", "enum": ["Low", "Medium", "High"]}
+            }
+          }
+        }
+      }
+    },
+    "agentLayer": {
+      "type": "object",
+      "properties": {
+        "agentBlueprints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agentId", "purpose"],
+            "properties": {
+              "agentId": {"type": "string"},
+              "purpose": {"type": "string"},
+              "trigger": {"type": "string"},
+              "decisions": {"type": "array", "items": {"type": "string"}},
+              "readinessScore": {"type": "integer", "minimum": 0, "maximum": 100}
+            }
+          }
+        }
+      }
+    }
+  }
+}
