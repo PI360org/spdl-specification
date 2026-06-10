@@ -303,9 +303,9 @@ cp examples/goods-receipt.spdl.json my-process.spdl.json
 - Check `/examples/` for how it works
 
 **About PI360:**
-- Web: https://pi360.org (Coming 2026)
-- Email: hello@pi360.org
-- LinkedIn: @pi360network
+- Web: https://pi360.org
+- Email: info@pi360.org
+- LinkedIn: [@pi360network](https://www.linkedin.com/company/pi360-network)
 
 **About this Repository:**
 - Issues: Questions, suggestions, bug reports
